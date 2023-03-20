@@ -8,7 +8,7 @@ export type Props = {
 	exercises: string[];
 };
 
-function Exercise({ name }: { name: string }) {
+export default function Home() {
 	const pythonInstructorPromise = useMemo(createPythonInstructor, []);
 	const [code, setCode] = useState<string | undefined>("");
 	const [input, setInput] = useState<string | undefined>("");
@@ -18,15 +18,15 @@ function Exercise({ name }: { name: string }) {
 		const pythonInstructor = await pythonInstructorPromise;
 		setStatus({ state: "Corriendo", stdout: [], stderr: [] });
 		const result = await pythonInstructor.runCode({ file: code ?? "", input: input?.split("\n") ?? [] });
-		setStatus({ state: result.error ? "Error" : "Ok", stdout: result.stdout, stderr: result.stderr });
-		console.log(result);
+		const error = result.error || result.stderr.length > 0;
+		setStatus({ state: error ? "Error" : "Ok", stdout: result.stdout, stderr: result.stderr });
 	};
 
 	return (
-		<details open className="border-base-300 border-4">
-			<summary className="flex items-center py-2 px-6 cursor-pointer bg-base-200">
+		<div>
+			<summary className="flex items-center py-2 px-6 cursor-pointer bg-base-200 sticky top-0 shadow-xl border-b-2 border-base-300 z-50">
 				<div className="flex-grow flex gap-4 items-center">
-					<h2 className="text-2xl bold font-bold">{name}</h2>
+					<h2 className="text-2xl bold font-bold">DCCorredor de Python</h2>
 					<div
 						className={clsx(
 							"px-2 py-1 rounded-full",
@@ -42,32 +42,37 @@ function Exercise({ name }: { name: string }) {
 					</button>
 				</div>
 			</summary>
-			<div className="p-4 flex flex-col gap-2">
-				<div className="mb-4">
-					<div className="p-2 font-bold text-lg">Input</div>
-					<Editor
-						height="20vh"
-						options={{ padding: { top: 8 } }}
-						defaultLanguage="textx"
-						defaultValue=""
-						value={input}
-						theme="vs-dark"
-						onChange={setInput}
-					/>
-				</div>
-				<div>
-					<div className="p-2 font-bold text-lg">Código</div>
-					<Editor
-						height="30vh"
-						options={{ padding: { top: 8 } }}
-						defaultLanguage="python"
-						defaultValue=""
-						value={code}
-						theme="vs-dark"
-						onChange={setCode}
-					/>
-				</div>
-				<details open className=" bg-base-200 rounded mt-4 border-base-300 border">
+			<div className="p-2 flex flex-col gap-2">
+				<details open className="bg-base-200 rounded border-base-300 border">
+					<summary className="marker:hidden list-none cursor-pointer bg-base-300 p-4">Entrada</summary>
+					<div className="p-2">
+						<div className="mb-4">
+							<div className="p-2 font-bold text-lg">Input</div>
+							<Editor
+								height="20vh"
+								options={{ padding: { top: 8 } }}
+								defaultLanguage="textx"
+								defaultValue=""
+								value={input}
+								theme="vs-dark"
+								onChange={setInput}
+							/>
+						</div>
+						<div>
+							<div className="p-2 font-bold text-lg">Código</div>
+							<Editor
+								height="30vh"
+								options={{ padding: { top: 8 } }}
+								defaultLanguage="python"
+								defaultValue=""
+								value={code}
+								theme="vs-dark"
+								onChange={setCode}
+							/>
+						</div>
+					</div>
+				</details>
+				<details open className="bg-base-200 rounded border-base-300 border">
 					<summary className="marker:hidden list-none cursor-pointer bg-base-300 p-4">Resultado</summary>
 					<div className="flex flex-col gap-4 p-4">
 						<div>
@@ -75,19 +80,13 @@ function Exercise({ name }: { name: string }) {
 							<pre className="bg-base-300 p-2 rounded-md min-h-16 overflow-y-scroll">{status.stdout.join("\n")}</pre>
 						</div>
 						<div>
-							Error
+							<span className={clsx({ "text-error": status.state === "Error" })}>Error</span>
+
 							<pre className="bg-base-300 p-2 rounded-md min-h-16 overflow-y-scroll">{status.stderr.join("\n")}</pre>
 						</div>
 					</div>
 				</details>
 			</div>
-		</details>
-	);
-}
-export default function Home({ exercises }: Props) {
-	return (
-		<div className="px-4 py-8">
-			<Exercise name="DCCorredor" />
 		</div>
 	);
 }
