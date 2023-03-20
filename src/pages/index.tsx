@@ -24,7 +24,7 @@ export default function Home() {
 
 	return (
 		<div>
-			<summary className="flex items-center py-2 px-6 cursor-pointer bg-base-200 sticky top-0 shadow-xl border-b-2 border-base-300 z-50">
+			<summary className="flex items-center py-2 px-6 bg-base-200 sticky top-0 shadow-xl border-b-2 border-base-300 z-50">
 				<div className="flex-grow flex gap-4 items-center">
 					<h2 className="text-2xl bold font-bold">DCCorredor de Python</h2>
 					<div
@@ -37,7 +37,11 @@ export default function Home() {
 					</div>
 				</div>
 				<div>
-					<button className="btn" onClick={onRun}>
+					<button
+						className={clsx("btn", status.state === "Corriendo" && "loading")}
+						onClick={onRun}
+						disabled={status.state === "Corriendo"}
+					>
 						Probar
 					</button>
 				</div>
